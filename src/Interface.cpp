@@ -1,7 +1,7 @@
 #include "Interface.hpp"
 
 
-Interface::Interface(sf::RenderWindow& okno, int& rodzajFraktala) : m_fractalType(rodzajFraktala), m_window(okno){
+Interface::Interface(sf::RenderWindow& window, int& rodzajFraktala) : m_fractalType(rodzajFraktala), m_window(window){
 
 	//	Okno przelaczania
 	//-----------------------------------------------

@@ -72,7 +72,7 @@ class Interface
 	};
 public:
 	Interface();
-	Interface(sf::RenderWindow& okno, int& rodzajFraktala);
+	Interface(sf::RenderWindow& window, int& rodzajFraktala);
 
 	void update(sf::Clock& clock);
 	void handleEvent(sf::Event event);
