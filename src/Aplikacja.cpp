@@ -1,6 +1,7 @@
 #include "Aplikacja.hpp"
 
 Aplikacja::Aplikacja(sf::RenderWindow& window, sf::Clock& clock) :
+m_sfgui(),
 m_window(window),
 m_clock(clock),
 m_fern(window.getSize().x, window.getSize().y),
@@ -10,14 +11,25 @@ m_carpet(window.getSize().x, window.getSize().y),
 m_koch(window.getSize().x, window.getSize().y),
 m_cantor(window.getSize().x, window.getSize().y),
 m_triangle(window.getSize().x, window.getSize().y),
-m_gui(window, m_fractalType)
-{
-	drawFrame = true;
-	m_fractalType = kJuli;
-}
+m_fractalType(kJuli),
+m_gui(window, m_fractalType),
+drawFrame(true)
+{}
 
 void Aplikacja::draw(){
 	m_gui.update(m_clock);
+
+	if (m_fractalType != m_gui.getFractalType()){
+		if (m_fractalType == kFern){
+			m_fern.clearIter();
+		}
+		if (m_fractalType == kTriangle){
+			m_triangle.clearIter();
+		}
+		m_fractalType = m_gui.getFractalType();
+	}
+
+	m_fractalType = m_gui.getFractalType();
 	if (drawFrame && m_fractalType != kFern && m_fractalType != kTriangle){
 		switch (m_fractalType){
 		case kMandel:
@@ -47,9 +59,11 @@ void Aplikacja::draw(){
 	else {
 		switch (m_fractalType){
 		case kTriangle:
+			m_gui.triangleSetIter(m_triangle.getIter());
 			m_triangle.drawFractal(m_window);
 			break;
 		case kFern:	
+			m_gui.fernSetIter(m_fern.getIter());
 			m_fern.drawFractal(m_window);
 			break;
 		}

@@ -14,26 +14,7 @@ Julia::Julia(int sizeX, int sizeY){
 	m_cY = 0.11;
 	m_cX = -0.75;
 	m_colorDensity = 2;
-	createPalette();
-}
-
-void Julia::createPalette(){
-	sf::Image gradient;
-	if (!gradient.loadFromFile("gradientJ.png"))
-		return;
-	sf::Vector3f tmpPalette[16];
-	for (int i = 0; i < 16; i++){
-		tmpPalette[i] = sf::Vector3f(gradient.getPixel((gradient.getSize().x)*i / 15, (gradient.getSize().y) / 2).r, 
-										gradient.getPixel((gradient.getSize().x)*i / 15, (gradient.getSize().y) / 2).g, 
-										gradient.getPixel((gradient.getSize().x)*i / 15, (gradient.getSize().y) / 2).b);
-	}
-	for (int i = 0; i < 16; i++){
-		for (int j = 0; j < 128; j++){
-			m_palette[i * 128 + j] = sf::Vector3f(lerp(tmpPalette[i].x, tmpPalette[(i + 1) % 16].x, (float)j / 128.f), 
-													lerp(tmpPalette[i].y, tmpPalette[(i + 1) % 16].y, (float)j / 128.f), 
-													lerp(tmpPalette[i].z, tmpPalette[(i + 1) % 16].z, (float)j / 128.f));
-		}
-	}
+	createPalette("gradientJ.png");
 }
 
 sf::Vector3f Julia::calcColor(int coord_X, int coord_Y){
@@ -91,83 +72,8 @@ sf::Vector3f Julia::calcColor(int coord_X, int coord_Y){
 	*/
 }
 
-float Julia::lerp(float x, float y, float t){
-	return (1 - t)*x + t*y;
-}
-
-void Julia::drawFractal(sf::RenderWindow& window){
-	sf::Uint8 *pixels = new sf::Uint8[m_sizeX * m_sizeY * 4];
-
-	tbb::parallel_for(0, m_sizeX, 1, [=](int x){
-		for (int y = 0; y < m_sizeY; y++){
-			sf::Vector3f color = calcColor(x, y);
-			if (color.x == 2000){
-				pixels[(x + y * m_sizeX) * 4] = 255; // R
-				pixels[(x + y * m_sizeX) * 4 + 1] = 255; // G
-				pixels[(x + y * m_sizeX) * 4 + 2] = 255; // B
-				pixels[(x + y * m_sizeX) * 4 + 3] = 0; // A
-			}
-			else{
-				pixels[(x + y * m_sizeX) * 4] = color.x;
-				pixels[(x + y * m_sizeX) * 4 + 1] = color.y; 
-				pixels[(x + y * m_sizeX) * 4 + 2] = color.z; 
-				pixels[(x + y * m_sizeX) * 4 + 3] = 255;
-			}
-
-		}
-	});
-
-	sf::Image image;
-	sf::Texture texture;
-
-	image.create(m_sizeX, m_sizeY, pixels);
-	delete[] pixels;
-	texture.loadFromImage(image);
-	sf::Sprite sprite;
-	sprite.setTexture(texture);
-	window.clear();
-	window.draw(sprite);
-}
 
 void Julia::setC(sf::Vector2f coord){
 	m_cX = coord.x;
 	m_cY = coord.y;
-}
-
-void Julia::setIter(int iter){
-	m_iteration = iter;
-}
-
-void Julia::handleEvents(sf::Event event){
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add 
-		|| (event.type == sf::Event::MouseWheelMoved && event.mouseWheel.delta > 0)){
-		m_minX += (m_maxX - m_minX)*0.15;
-		m_maxX -= (m_maxX - m_minX)*0.15;
-		m_minY += (m_maxY - m_minY)*0.15;
-		m_maxY -= (m_maxY - m_minY)*0.15;
-
-	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract
-		|| (event.type == sf::Event::MouseWheelMoved && event.mouseWheel.delta < 0)){
-		m_minX -= (m_maxX - m_minX)*0.15;
-		m_maxX += (m_maxX - m_minX)*0.15;
-		m_minY -= (m_maxY - m_minY)*0.15;
-		m_maxY += (m_maxY - m_minY)*0.15;
-	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left){
-		m_minX -= (m_maxX - m_minX)*0.1;
-		m_maxX -= (m_maxX - m_minX)*0.1;
-	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right){
-		m_minX += (m_maxX - m_minX)*0.1;
-		m_maxX += (m_maxX - m_minX)*0.1;
-	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up){
-		m_minY += (m_maxY - m_minY)*0.1;
-		m_maxY += (m_maxY - m_minY)*0.1;
-	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down){
-		m_minY -= (m_maxY - m_minY)*0.1;
-		m_maxY -= (m_maxY - m_minY)*0.1;
-	}
 }

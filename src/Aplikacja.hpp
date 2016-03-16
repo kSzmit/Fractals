@@ -12,6 +12,8 @@
 #include "Interface.hpp"
 
 class Aplikacja{
+	sfg::SFGUI m_sfgui;
+
 	int m_fractalType;
 	bool drawFrame;
 	
@@ -27,7 +29,6 @@ class Aplikacja{
 	Fern m_fern;
 	Interface m_gui;
 
-	sfg::SFGUI m_sfgui;
 
 	enum fraq {
 		kCantor,
@@ -40,7 +41,7 @@ class Aplikacja{
 	};
 public:
 	Aplikacja();
-	Aplikacja(sf::RenderWindow& okno, sf::Clock& clock);
+	Aplikacja(sf::RenderWindow& window, sf::Clock& clock);
 
 	void handleEvents();
 	void draw();

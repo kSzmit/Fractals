@@ -3,14 +3,14 @@
 
 
 int main(int argc, char *argv[]){
-	int sizeX = 1500, sizeY = 1000;
+	int sizeX = 1366, sizeY = 768;
 	
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 2;
 
 	//sf::VideoMode(sizeX, sizeY, 32)
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-	sf::RenderWindow window(desktop, "Przeglad fraktali", sf::Style::Fullscreen, settings);
+	sf::RenderWindow window(sf::VideoMode(sizeX, sizeY, 32), "Przeglad fraktali", sf::Style::Default, settings);
 
 	sf::Clock clock;
 	Aplikacja app(window, clock);

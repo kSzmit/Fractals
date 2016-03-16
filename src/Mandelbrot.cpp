@@ -1,6 +1,9 @@
 #include "Mandelbrot.hpp"
 #include <tbb\tbb.h>
 
+Mandelbrot::Mandelbrot(){
+}
+
 Mandelbrot::Mandelbrot(int sizeX, int sizeY){
 	m_sizeX = sizeX;
 	m_sizeY = sizeY;
@@ -10,13 +13,13 @@ Mandelbrot::Mandelbrot(int sizeX, int sizeY){
 	m_minY = -1.45;
 	m_iteration = 55;
 	m_paletteSize = 2048;
-	createPalette();
+	createPalette("gradientM.png");
 	m_colorDensity = 2;
 }
 
-void Mandelbrot::createPalette(){
+void Mandelbrot::createPalette(std::string fileName){
 	sf::Image gradient;
-	if (!gradient.loadFromFile("gradientM.png"))
+	if (!gradient.loadFromFile(fileName))
 		return;
 	sf::Vector3f tmpPalette[16];
 	for (int i = 0; i < 16; i++){

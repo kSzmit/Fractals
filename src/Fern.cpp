@@ -5,7 +5,8 @@
 Fern::Fern(){
 }
 
-Fern::Fern(int sizeX, int sizeY) : m_point(sf::Vector2f(1, 1)) {
+Fern::Fern(int sizeX, int sizeY) {
+	m_point = sf::RectangleShape(sf::Vector2f(1, 1));
 	if (sizeX > sizeY / 2){
 		m_sizeX = sizeY / 2;
 	}
@@ -52,12 +53,9 @@ void Fern::iterPoint(){
 	}
 }
 
-void Fern::setColor(sf::Color kolor){
-	m_point.setFillColor(kolor);
-}
-
 void Fern::drawFractal(sf::RenderWindow& window){
 	iterPoint();
+	m_iter += 1;
 	sf::RectangleShape tmpPoint = m_point;
 	tmpPoint.move((window.getSize().x - getSize().x) / 2, window.getSize().y / 10);
 	window.draw(tmpPoint);

@@ -5,7 +5,8 @@ Triangle::Triangle()
 {
 }
 
-Triangle::Triangle(int sizeX, int sizeY) : m_point(sf::Vector2f(1, 1)){
+Triangle::Triangle(int sizeX, int sizeY){
+	m_point = sf::RectangleShape(sf::Vector2f(1, 1));
 	m_sizeX = sizeX;
 	m_sizeY = sizeX;
 	int tmp = 1.1*(sizeX - sizeY);
@@ -38,13 +39,4 @@ void Triangle::iterPoint(){
 		D.y = (D.y + m_C.y) / 2;
 	}
 	m_point.setPosition(D);
-}
-
-void Triangle::setColor(sf::Color color){
-	m_point.setFillColor(color);
-}
-
-void Triangle::drawFractal(sf::RenderWindow& window){
-	iterPoint();
-	window.draw(m_point);
 }

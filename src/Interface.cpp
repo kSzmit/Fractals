@@ -1,203 +1,82 @@
 #include "Interface.hpp"
 
 
-Interface::Interface(sf::RenderWindow& window, int& rodzajFraktala) : m_fractalType(rodzajFraktala), m_window(window){
-
-	//	Okno przelaczania
-	//-----------------------------------------------
-	m_switchWindowFractal = sfg::Window::Create(2);
-	m_switchBoxFractal = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 10.f);
-
-	m_switchButtonKoch = sfg::Button::Create("Gwiazdka Kocha");
-	m_switchButtonCarpet = sfg::Button::Create("Dywan Sierpinskiego");
-	m_switchButtonJuli = sfg::Button::Create("Zbior Julii");
-	m_switchButtonFern = sfg::Button::Create("Paproc Barnsleya");
-	m_switchButtonMandel = sfg::Button::Create("Zbior Mandelbrota");
-	m_switchButtonKantor = sfg::Button::Create("Zbior Cantora");
-	m_switchButtonTriangle = sfg::Button::Create("Trojkat Sierpinskiego");
-
-	m_switchBoxFractal->Pack(m_switchButtonKoch);
-	m_switchBoxFractal->Pack(m_switchButtonCarpet);
-	m_switchBoxFractal->Pack(m_switchButtonJuli);
-	m_switchBoxFractal->Pack(m_switchButtonFern);
-	m_switchBoxFractal->Pack(m_switchButtonMandel);
-	m_switchBoxFractal->Pack(m_switchButtonKantor);
-	m_switchBoxFractal->Pack(m_switchButtonTriangle);
-
-	m_switchButtonKoch->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kKoch));
-	m_switchButtonCarpet->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kSierpinskiCarpet));
-	m_switchButtonJuli->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kJuli));
-	m_switchButtonFern->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kFern));
-	m_switchButtonMandel->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kMandel));
-	m_switchButtonKantor->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kCantor));
-	m_switchButtonTriangle->GetSignal(sfg::Widget::OnLeftClick).Connect(std::bind(&Interface::buttonSwitchClick, this, kTriangle));
-
-	m_switchWindowFractal->Add(m_switchBoxFractal);
-
-	//	Okno koch
-	//-----------------------------------------------
-
-	m_kochWindow = sfg::Window::Create();
-	m_kochWindow->SetTitle("Ustawienia");
-	m_kochBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	m_kochLabelIter = sfg::Label::Create("iteracja");
-	m_kochButtonIter = sfg::SpinButton::Create(0.f, 10.f, 1.f);
-	m_kochButtonIter->SetRequisition(sf::Vector2f(80.f, 0.f));
-	m_kochButtonIter->SetDigits(0);
-
-	m_kochBox->Pack(m_kochLabelIter);
-	m_kochBox->Pack(m_kochButtonIter);
-	m_kochWindow->Add(m_kochBox);
-
-	m_kochWindow->SetPosition(sf::Vector2f(0, 200));
-	m_kochWindow->Show(false);
-
-	//	Okno carpet
-	//-----------------------------------------------
-
-	m_carpetWindow = sfg::Window::Create();
-	m_carpetWindow->SetTitle("Ustawienia");
-	m_carpetBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	m_carpetLabelIter = sfg::Label::Create("iteracja");
+Interface::Interface(sf::RenderWindow& window, int fractalType) : m_fractalType(fractalType), m_window(window){
+	m_kochWindow = IterWindow(0, 10, 1);
 	int carpetMaxIter = floor((log(std::min(m_window.getSize().x, m_window.getSize().y)) / log(3)));
-	m_carpetButtonIter = sfg::SpinButton::Create(0.f, carpetMaxIter, 1.f);
-	m_carpetButtonIter->SetRequisition(sf::Vector2f(80.f, 0.f));
-	m_carpetButtonIter->SetDigits(0);
+	m_carpetWindow = IterWindow(0, carpetMaxIter, 1);
+	m_cantorWindow = IterWindow(0, 10, 1);
+	m_mandelWindow = IterWindow(5, 1000, 2);
+	m_mandelWindow.setIter(50);
+	m_juliWindow = JuliaIterWindow(5, 1000, 10);
+	m_juliWindow.setIter(500);
+	m_juliWindow.show(true);
+	m_fernWindow = IterCounterWindow();
+	m_triangleWindow = IterCounterWindow();
 
-	m_carpetBox->Pack(m_carpetLabelIter);
-	m_carpetBox->Pack(m_carpetButtonIter);
-	m_carpetWindow->Add(m_carpetBox);
+	m_switchWindow = SwitchWindow(this);
 
-	m_carpetWindow->SetPosition(sf::Vector2f(0, 200));
-	m_carpetWindow->Show(false);
-
-	//	Okno cantor
-	//-----------------------------------------------
-
-	m_cantorWindow = sfg::Window::Create();
-	m_cantorWindow->SetTitle("Ustawienia");
-	m_cantorBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	m_cantorLabelIter = sfg::Label::Create("iteracja");
-	m_cantorButtonIter = sfg::SpinButton::Create(0.f, 10.f, 1.f);
-	m_cantorButtonIter->SetRequisition(sf::Vector2f(80.f, 0.f));
-	m_cantorButtonIter->SetDigits(0);
-
-	m_cantorBox->Pack(m_cantorLabelIter);
-	m_cantorBox->Pack(m_cantorButtonIter);
-	m_cantorWindow->Add(m_cantorBox);
-
-	m_cantorWindow->SetPosition(sf::Vector2f(0, 200));
-	m_cantorWindow->Show(false);
-
-	// Okno julia
-	//-----------------------------------------------
-
-	m_juliWindow = sfg::Window::Create();
-	m_juliWindow->SetTitle("Ustawienia");
-	m_juliBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	m_juliButtonCx = sfg::SpinButton::Create(-2.f, 2.f, 0.001f);
-	m_juliButtonCy = sfg::SpinButton::Create(-2.f, 2.f, 0.001f);
-	m_juliButtonIter = sfg::SpinButton::Create(5.f, 1000.f, 10.f);
-
-	m_juliButtonIter->SetDigits(0);
-	m_juliButtonCx->SetDigits(3);
-	m_juliButtonCy->SetDigits(3);
-
-	m_juliButtonIter->SetValue(500);
-	m_juliButtonCx->SetValue(-0.75f);
-	m_juliButtonCy->SetValue(0.11f);
-
-	m_juliLabelIter = sfg::Label::Create("Ile iteracji");
-	m_juliLabelCx = sfg::Label::Create("wartosc Cx");
-	m_juliLabelCy = sfg::Label::Create("wartosc Cy");
-
-	m_juliBox->Pack(m_juliLabelIter);
-	m_juliBox->Pack(m_juliButtonIter);
-	m_juliBox->Pack(m_juliLabelCx);
-	m_juliBox->Pack(m_juliButtonCx);
-	m_juliBox->Pack(m_juliLabelCy);
-	m_juliBox->Pack(m_juliButtonCy);
-	m_juliWindow->Add(m_juliBox);
-
-	m_juliWindow->SetPosition(sf::Vector2f(0, 200));
-
-	//	Okno mandelbrot
-	//-----------------------------------------------
-
-	m_mandelWindow = sfg::Window::Create();
-	m_mandelWindow->SetTitle("Ustawienia");
-	m_mandelBox = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
-
-	m_mandelLabelIter = sfg::Label::Create("Ile iteracji");
-	m_mandelButtonIter = sfg::SpinButton::Create(5.f, 1000.f, 2.f);
-	m_mandelButtonIter->SetRequisition(sf::Vector2f(80.f, 0.f));
-	m_mandelButtonIter->SetDigits(0);
-	m_mandelButtonIter->SetValue(50);
-
-	m_mandelBox->Pack(m_mandelLabelIter);
-	m_mandelBox->Pack(m_mandelButtonIter);
-	m_mandelWindow->Add(m_mandelBox);
-
-	m_mandelWindow->SetPosition(sf::Vector2f(0, 200));
-	m_mandelWindow->Show(false);
-
-	//-----------------------------------------------
-
-	m_desktop.Add(m_carpetWindow);
-	m_desktop.Add(m_mandelWindow);
-	m_desktop.Add(m_juliWindow);
-	m_desktop.Add(m_cantorWindow);
-	m_desktop.Add(m_kochWindow);
-	m_desktop.Add(m_switchWindowFractal);
-	m_desktop.Update(0.f);
-}
-
-void Interface::buttonSwitchClick(int switchTo){
-	showHideWindows(switchTo);
-	m_fractalType = switchTo;
-	m_window.clear(sf::Color::White);
+	m_desktop.Add(m_carpetWindow.getWindow());
+	m_desktop.Add(m_mandelWindow.getWindow());
+	m_desktop.Add(m_juliWindow.getWindow());
+	m_desktop.Add(m_cantorWindow.getWindow());
+	m_desktop.Add(m_kochWindow.getWindow());
+	m_desktop.Add(m_fernWindow.getWindow());
+	m_desktop.Add(m_triangleWindow.getWindow());
+	m_desktop.Add(m_switchWindow.getWindow());
+	m_desktop.Update(0.0f);
 }
 
 void Interface::showHideWindows(int show){
 	switch (m_fractalType){
 	case kCantor:
-		m_cantorWindow->Show(false);
+		m_cantorWindow.show(false);
 		break;
 	case kKoch:
-		m_kochWindow->Show(false);
+		m_kochWindow.show(false);
 		break;
 	case kJuli:
-		m_juliWindow->Show(false);
+		m_juliWindow.show(false);
 		break;
 	case kMandel:
-		m_mandelWindow->Show(false);
+		m_mandelWindow.show(false);
 		break;
 	case kSierpinskiCarpet:
-		m_carpetWindow->Show(false);
+		m_carpetWindow.show(false);
+		break;
+	case kFern:
+		m_fernWindow.show(false);
+		break;
+	case kTriangle:
+		m_triangleWindow.show(false);
 		break;
 	}
 
 	switch (show){
 	case kCantor:
-		m_cantorWindow->Show(true);
+		m_cantorWindow.show(true);
 		break;
 	case kKoch:
-		m_kochWindow->Show(true);
+		m_kochWindow.show(true);
 		break;
 	case kJuli:
-		m_juliWindow->Show(true);
+		m_juliWindow.show(true);
 		break;
 	case kMandel:
-		m_mandelWindow->Show(true);
+		m_mandelWindow.show(true);
 		break;
 	case kSierpinskiCarpet:
-		m_carpetWindow->Show(true);
+		m_carpetWindow.show(true);
+		break;
+	case kFern:
+		m_fernWindow.show(true);
+		break;
+	case kTriangle:
+		m_triangleWindow.show(true);
 		break;
 	}
+	setFractalType(show);
+	clearWindow(sf::Color::White);
 }
 
 void Interface::update(sf::Clock& clock){
@@ -215,25 +94,45 @@ void Interface::handleEvent(sf::Event event){
 }
 
 int Interface::kochGetIter(){
-	return m_kochButtonIter->GetValue();
+	return m_kochWindow.getIter();
 }
 
 int Interface::cantorGetIter(){
-	return m_cantorButtonIter->GetValue();
+	return m_cantorWindow.getIter();
 }
 
 int Interface::juliGetIter(){
-	return m_juliButtonIter->GetValue();
+	return m_juliWindow.getIter();
 }
 
 int Interface::mandelGetIter(){
-	return m_mandelButtonIter->GetValue();
+	return m_mandelWindow.getIter();
 }
 
 int Interface::carpetGetIter(){
-	return m_carpetButtonIter->GetValue();
+	return m_carpetWindow.getIter();
 }
 
 sf::Vector2f Interface::juliGetC(){
-	return sf::Vector2f(m_juliButtonCx->GetValue(), m_juliButtonCy->GetValue());
+	return m_juliWindow.GetC();
+}
+
+void Interface::fernSetIter(int iter){
+	m_fernWindow.setIter(iter);
+}
+
+void Interface::triangleSetIter(int iter){
+	m_triangleWindow.setIter(iter);
+}
+
+void Interface::setFractalType(int num){
+	m_fractalType = num;
+}
+
+void Interface::clearWindow(sf::Color color){
+	m_window.clear(color);
+}
+
+int Interface::getFractalType(){
+	return m_fractalType;
 }
