@@ -1,10 +1,12 @@
 #pragma once
-#include "IterWindow.hpp"
+#include "IterWindowMandelbrot.hpp"
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 
+class Interface;
+
 class JuliaIterWindow :
-	public IterWindow
+	public IterWindowMandelbrot
 {
 	sfg::SpinButton::Ptr m_buttonCx;
 	sfg::SpinButton::Ptr m_buttonCy;
@@ -13,8 +15,7 @@ class JuliaIterWindow :
 
 public:
 	JuliaIterWindow();
-	JuliaIterWindow(int min, int max, int step);
+	JuliaIterWindow(int min, int max, int step, Interface* interface);
 	sf::Vector2f GetC();
-
 };
 

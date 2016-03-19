@@ -45,5 +45,7 @@ public:
 
 	void handleEvents();
 	void draw();
+
+	sf::RenderWindow& getWindow();
 };
 

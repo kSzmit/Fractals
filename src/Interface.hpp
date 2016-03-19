@@ -4,20 +4,23 @@
 #include <SFGUI/Widgets.hpp>
 #include "IterWindow.hpp"
 #include "JuliaIterWindow.hpp"
-#include "SwitchWindow.hpp"
+#include "TopMenu.hpp"
 #include "IterCounterWindow.hpp"
+#include "IterWindowMandelbrot.hpp"
+
+class Aplikacja;
 
 class Interface
 {
-	sf::RenderWindow& m_window;
+	Aplikacja* m_appPtr;
 
 	sfg::Desktop m_desktop;
 	
-	SwitchWindow m_switchWindow;
+	TopMenu m_switchWindow;
 
 	IterWindow m_kochWindow;
 	IterWindow m_cantorWindow;
-	IterWindow m_mandelWindow;
+	IterWindowMandelbrot m_mandelWindow;
 	IterWindow m_carpetWindow;
 	JuliaIterWindow m_juliWindow;
 	IterCounterWindow m_fernWindow;
@@ -36,12 +39,14 @@ class Interface
 	};
 public:
 	Interface();
-	Interface(sf::RenderWindow& window, int fractalType);
+	Interface(Aplikacja* appPtr, int fractalType);
 
 	void clearWindow(sf::Color color);
 
 	void setFractalType(int num);
 	int getFractalType();
+
+	sf::RenderWindow& getInterfaceWindow();
 
 	void update(sf::Clock& clock);
 	void handleEvent(sf::Event event);
@@ -52,8 +57,10 @@ public:
 	int juliGetIter();
 	int mandelGetIter();
 	int carpetGetIter();
-	void fernSetIter(int iter);
-	void triangleSetIter(int iter);
+	void fernUpdate(int iter);
+	void triangleUpdate(int iter);
+	void mandelbrotUpdate(long double x, long double y, int zoomPower);
+	void juliaUpdate(long double x, long double y, int zoomPower);
 	sf::Vector2f juliGetC();
 
 };

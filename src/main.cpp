@@ -10,7 +10,7 @@ int main(int argc, char *argv[]){
 
 	//sf::VideoMode(sizeX, sizeY, 32)
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-	sf::RenderWindow window(sf::VideoMode(sizeX, sizeY, 32), "Przeglad fraktali", sf::Style::Default, settings);
+	sf::RenderWindow window(sf::VideoMode(sizeX, sizeY, 32), "Przeglad fraktali", 5, settings);
 
 	sf::Clock clock;
 	Aplikacja app(window, clock);
@@ -20,6 +20,5 @@ int main(int argc, char *argv[]){
 			app.draw();
 			window.display();
 		}
-
 	return 0;
 }

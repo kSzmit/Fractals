@@ -5,11 +5,12 @@
 class Julia :
 	public Mandelbrot
 {
+	sf::RenderWindow& m_appWindow;
 	double m_cY;
 	double m_cX;
 public:
-	Julia(int sizeX, int sizeY);
-	sf::Vector3f calcColor(int coord_X, int coord_Y) override;
+	Julia(sf::RenderWindow& appWindow);
+	sf::Vector3f calcColor(int coordX, int coordY) override;
 	void setC(sf::Vector2f coord);
 };
 

@@ -2,13 +2,22 @@
 #include <tbb\tbb.h>
 
 
-Julia::Julia(int sizeX, int sizeY){
-	m_sizeX = sizeX;
-	m_sizeY = sizeY;
-	m_maxX = 0.7*sizeX / sizeY;
-	m_minX = -2.2*sizeX / sizeY;
-	m_maxY = 1.45;
-	m_minY = -1.45;
+Julia::Julia(sf::RenderWindow& appWindow) :
+m_appWindow(appWindow),
+Mandelbrot(appWindow)
+{
+	m_sizeX = appWindow.getSize().x;
+	m_sizeY = appWindow.getSize().y;
+
+	sMaxX = 0.7*m_sizeX / m_sizeY;
+	sMaxY = 1.45;
+	sMinX = -2.2*m_sizeX / m_sizeY;
+	sMinY = -1.45;
+
+	m_zoom = 1;
+
+	m_X = (sMaxX + sMinX) / 2;
+	m_Y = (sMaxY + sMinY) / 2;
 	m_iteration = 500;
 	m_paletteSize = 2048;
 	m_cY = 0.11;
@@ -17,11 +26,11 @@ Julia::Julia(int sizeX, int sizeY){
 	createPalette("gradientJ.png");
 }
 
-sf::Vector3f Julia::calcColor(int coord_X, int coord_Y){
-	long double step_x = (m_maxX - m_minX) / (long double)m_sizeX;
-	long double step_y = (m_maxY - m_minY) / (long double)m_sizeY;
-	long double Zx = m_minX + coord_X*step_x;
-	long double Zy = m_maxY - coord_Y*step_y;
+sf::Vector3f Julia::calcColor(int coordX, int coordY){
+	long double step_x = (sMaxX - sMinX) / m_zoom / (long double)m_sizeX;
+	long double step_y = (sMaxY - sMinY) / m_zoom / (long double)m_sizeY;
+	long double Zx = m_X + (coordX - m_sizeX / 2)*step_x;
+	long double Zy = m_Y - (coordY - m_sizeY / 2)*step_y;
 	long double Zx2 = Zx*Zx;
 	long double Zy2 = Zy*Zy;
 	int i = 0;

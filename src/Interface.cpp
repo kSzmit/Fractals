@@ -1,20 +1,23 @@
 #include "Interface.hpp"
+#include "Aplikacja.hpp"
 
+Interface::Interface(){
+}
 
-Interface::Interface(sf::RenderWindow& window, int fractalType) : m_fractalType(fractalType), m_window(window){
+Interface::Interface(Aplikacja* appPtr, int fractalType) : m_fractalType(fractalType), m_appPtr(appPtr){
 	m_kochWindow = IterWindow(0, 10, 1);
-	int carpetMaxIter = floor((log(std::min(m_window.getSize().x, m_window.getSize().y)) / log(3)));
+	int carpetMaxIter = floor((log(std::min(appPtr->getWindow().getSize().x, appPtr->getWindow().getSize().y)) / log(3)));
 	m_carpetWindow = IterWindow(0, carpetMaxIter, 1);
 	m_cantorWindow = IterWindow(0, 10, 1);
-	m_mandelWindow = IterWindow(5, 1000, 2);
+	m_mandelWindow = IterWindowMandelbrot(5, 1000, 2, this);
 	m_mandelWindow.setIter(50);
-	m_juliWindow = JuliaIterWindow(5, 1000, 10);
+	m_juliWindow = JuliaIterWindow(5, 1000, 10, this);
 	m_juliWindow.setIter(500);
 	m_juliWindow.show(true);
 	m_fernWindow = IterCounterWindow();
 	m_triangleWindow = IterCounterWindow();
 
-	m_switchWindow = SwitchWindow(this);
+	m_switchWindow = TopMenu(this);
 
 	m_desktop.Add(m_carpetWindow.getWindow());
 	m_desktop.Add(m_mandelWindow.getWindow());
@@ -117,12 +120,20 @@ sf::Vector2f Interface::juliGetC(){
 	return m_juliWindow.GetC();
 }
 
-void Interface::fernSetIter(int iter){
+void Interface::fernUpdate(int iter){
 	m_fernWindow.setIter(iter);
 }
 
-void Interface::triangleSetIter(int iter){
+void Interface::triangleUpdate(int iter){
 	m_triangleWindow.setIter(iter);
+}
+
+void Interface::mandelbrotUpdate(long double x, long double y, int zoomPower){
+	m_mandelWindow.update(x, y, zoomPower);
+}
+
+void Interface::juliaUpdate(long double x, long double y, int zoomPower){
+	m_juliWindow.update(x, y, zoomPower);
 }
 
 void Interface::setFractalType(int num){
@@ -130,9 +141,13 @@ void Interface::setFractalType(int num){
 }
 
 void Interface::clearWindow(sf::Color color){
-	m_window.clear(color);
+	m_appPtr->getWindow().clear(color);
 }
 
 int Interface::getFractalType(){
 	return m_fractalType;
+}
+
+sf::RenderWindow& Interface::getInterfaceWindow(){
+	return m_appPtr->getWindow();
 }

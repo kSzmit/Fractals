@@ -5,16 +5,17 @@ m_sfgui(),
 m_window(window),
 m_clock(clock),
 m_fern(window.getSize().x, window.getSize().y),
-m_julia(window.getSize().x, window.getSize().y),
-m_mandelbrot(window.getSize().x, window.getSize().y),
+m_julia(window),
+m_mandelbrot(window),
 m_carpet(window.getSize().x, window.getSize().y),
 m_koch(window.getSize().x, window.getSize().y),
 m_cantor(window.getSize().x, window.getSize().y),
 m_triangle(window.getSize().x, window.getSize().y),
 m_fractalType(kJuli),
-m_gui(window, m_fractalType),
-drawFrame(true)
-{}
+drawFrame(true),
+m_gui(this, m_fractalType)
+{
+}
 
 void Aplikacja::draw(){
 	m_gui.update(m_clock);
@@ -33,10 +34,12 @@ void Aplikacja::draw(){
 	if (drawFrame && m_fractalType != kFern && m_fractalType != kTriangle){
 		switch (m_fractalType){
 		case kMandel:
+			m_gui.mandelbrotUpdate(m_mandelbrot.getX(), m_mandelbrot.getY(), m_mandelbrot.getZoomPower());
 			m_mandelbrot.setIter(m_gui.mandelGetIter());
 			m_mandelbrot.drawFractal(m_window);
 			break;
 		case kJuli:
+			m_gui.juliaUpdate(m_julia.getX(), m_julia.getY(), m_julia.getZoomPower());
 			m_julia.setIter(m_gui.juliGetIter());
 			m_julia.setC(m_gui.juliGetC());
 			m_julia.drawFractal(m_window);
@@ -59,11 +62,11 @@ void Aplikacja::draw(){
 	else {
 		switch (m_fractalType){
 		case kTriangle:
-			m_gui.triangleSetIter(m_triangle.getIter());
+			m_gui.triangleUpdate(m_triangle.getIter());
 			m_triangle.drawFractal(m_window);
 			break;
 		case kFern:	
-			m_gui.fernSetIter(m_fern.getIter());
+			m_gui.fernUpdate(m_fern.getIter());
 			m_fern.drawFractal(m_window);
 			break;
 		}
@@ -87,38 +90,6 @@ void Aplikacja::handleEvents(){
 		if (event.type == sf::Event::Closed){
 			m_window.close();
 		}
-		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R){
-			switch (m_fractalType){
-			case kMandel:
-				m_window.clear();
-				m_mandelbrot = Mandelbrot(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kJuli:
-				m_window.clear();
-				m_julia = Julia(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kSierpinskiCarpet:
-				m_window.clear();
-				m_carpet = SierpinskiCarpet(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kKoch:
-				m_window.clear();
-				m_koch = Koch(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kCantor:
-				m_window.clear();
-				m_cantor = Cantor(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kTriangle:
-				m_window.clear();
-				m_cantor = Cantor(m_window.getSize().x, m_window.getSize().y);
-				break;
-			case kFern:
-				m_window.clear();
-				Fern m_fern(m_window.getSize().x, m_window.getSize().y);
-				break;
-			}
-		}
 		switch (m_fractalType){
 		case kMandel:
 			m_mandelbrot.handleEvents(event);
@@ -128,4 +99,8 @@ void Aplikacja::handleEvents(){
 			break;
 		}
 	}
+}
+
+sf::RenderWindow& Aplikacja::getWindow(){
+	return m_window;
 }

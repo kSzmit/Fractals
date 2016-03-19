@@ -8,7 +8,7 @@ IterWindow::IterWindow(int min, int max, int step){
 	m_window->SetTitle("Ustawienia");
 	m_box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 10.f);
 
-	m_labelIter = sfg::Label::Create("iteracja");
+	m_labelIter = sfg::Label::Create("Iteracja");
 	m_buttonIter = sfg::SpinButton::Create(min, max, step);
 	m_buttonIter->SetRequisition(sf::Vector2f(80.f, 0.f));
 	m_buttonIter->SetDigits(0);
